@@ -1,0 +1,6 @@
+{
+  "name": "conges-app-af",
+  "private": true,
+  "description": "Suivi personnel des congés (application web statique)",
+  "scripts": { "test": "node --test tests/*.test.js" }
+}
