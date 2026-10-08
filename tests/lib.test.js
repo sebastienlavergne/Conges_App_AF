@@ -69,3 +69,41 @@ test('formatage', () => {
   assert.equal(L.formatHours(53.5), '53 h 30');
   assert.equal(L.formatHours(-7), '-7 h');
 });
+
+test('migration v1 -> v2 : « PI Event » devient un type de jour', () => {
+  const old = {
+    version: 1,
+    places: ['CDG', 'PI Event'],
+    years: { 2026: { quotas: {}, holidays: [], schoolHolidays: [], days: {
+      '2026-01-19': { p: 'PI Event' }, '2026-01-20': { c: 'TT', p: 'PI Event' }, '2026-01-21': { c: 'CA', p: 'CDG' } } } }
+  };
+  const m = L.normalizeModel(old);
+  assert.equal(m.version, 2);
+  assert.deepEqual(m.places.map((p) => p.name), ['CDG']);
+  assert.ok(L.typeByCode(m, 'PI'));
+  const d = m.years['2026'].days;
+  assert.deepEqual(d['2026-01-19'], { c: 'PI' });
+  assert.deepEqual(d['2026-01-20'], { c: 'TT' }); // le code déjà saisi est conservé
+  assert.deepEqual(d['2026-01-21'], { c: 'CA', p: 'CDG' });
+  // idempotent
+  assert.deepEqual(L.normalizeModel(JSON.parse(JSON.stringify(m))).years['2026'].days, d);
+});
+
+test('migration : un modèle v1 déjà stocké sans type PI le reçoit après « A »', () => {
+  const old = { version: 1, types: [{ code: 'TT', label: 'TT', color: '#000' }, { code: 'A', label: 'A', color: '#111' }, { code: 'CA', label: 'CA', color: '#222' }], years: {} };
+  assert.deepEqual(L.normalizeModel(old).types.map((t) => t.code), ['TT', 'A', 'PI', 'CA']);
+});
+
+test('couleurs week-end / férié : valeurs par défaut, personnalisées, et ignorées si invalides', () => {
+  assert.deepEqual(L.normalizeModel({ years: {} }).dayColors, L.DEFAULT_DAY_COLORS);
+  const m = L.normalizeModel({ version: 2, dayColors: { weekend: '#112233', holiday: 'rouge' }, years: {} });
+  assert.equal(m.dayColors.weekend, '#112233');
+  assert.equal(m.dayColors.holiday, L.DEFAULT_DAY_COLORS.holiday);
+});
+
+test('graine : PI Event est un type, 10 jours en 2026, plus de lieu du même nom', () => {
+  const m = L.normalizeModel(loadSeed());
+  assert.ok(!m.places.some((p) => p.name === 'PI Event'));
+  const s = L.yearStats(m, '2026', '2026-10-08');
+  assert.equal(s.rows.find((r) => r.type.code === 'PI').planned, 10);
+});

@@ -24,6 +24,8 @@ DST = sys.argv[2] if len(sys.argv) > 2 else "data/seed.js"
 CODE_ALIASES = {"CP": "CA"}  # congés payés (2018-2021) = congés annuels CA01
 QUOTA_CODES = {"CA", "CJT", "CCA", "RA", "CH"}
 KNOWN_CODES = {"A", "TT", "CA", "CP", "CJT", "CCA", "RA", "CH", "Dmgt", "ML", "F", "SP", "OFF"}
+# Légende colorée devenue un type de jour : nom dans la légende -> code
+PLACE_AS_TYPE = {"PI Event": "PI"}
 NOT_A_PLACE = {"Type", "Max", "Droits", "Jours ouvrés", "Jours trav.", "Jours fériés",
                "Vacances scolaires", "Hiver", "Printemps", "Eté", "Été", "Toussaint", "Noël"} | KNOWN_CODES
 
@@ -58,7 +60,7 @@ for ws in wb_f:
             sig = fill_sig(c)
             if sig is not None:
                 legend[sig] = c.value
-                if c.value not in place_names:
+                if c.value not in place_names and c.value not in PLACE_AS_TYPE:
                     place_names.append(c.value)
 
     # --- grille des jours ---
@@ -71,6 +73,8 @@ for ws in wb_f:
             if code:
                 code = CODE_ALIASES.get(code.strip(), code.strip())
             place = legend.get(fill_sig(date_cell)) or legend.get(fill_sig(code_cell))
+            if place in PLACE_AS_TYPE:
+                code, place = code or PLACE_AS_TYPE[place], None  # un code déjà saisi est conservé
             if code or place:
                 entry = {}
                 if code:
@@ -99,7 +103,7 @@ for ws in wb_f:
         "days": dict(sorted(days.items())),
     }
 
-seed = {"version": 1, "places": place_names, "years": dict(sorted(years.items()))}
+seed = {"version": 2, "places": place_names, "years": dict(sorted(years.items()))}
 with open(DST, "w", encoding="utf-8") as f:
     f.write("// Généré par tools/import_excel.py à partir de AF_Activites.xlsx\n")
     f.write("window.CONGES_SEED = ")

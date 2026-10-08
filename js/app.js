@@ -118,6 +118,13 @@
     }
   }
 
+  // Couleurs week-end / jour férié : variables CSS (les valeurs par défaut sont dans style.css).
+  function applyDayColors() {
+    var st = document.documentElement.style;
+    st.setProperty('--weekend-c', model.dayColors.weekend);
+    st.setProperty('--holiday-c', model.dayColors.holiday);
+  }
+
   function renderYearSelect() {
     var sel = $('year-select'), years = {};
     Object.keys(model.years).forEach(function (y) { years[y] = true; });
@@ -132,11 +139,9 @@
   function renderCalendar() {
     var y = yearData(year), holidays = C.toSet(y.holidays), stats = C.yearStats(model, year, today);
     var cal = $('calendar'); cal.textContent = '';
-    cal.appendChild(el('div', { class: 'cal-head corner' }));
     C.MONTHS.forEach(function (m) { cal.appendChild(el('div', { class: 'cal-head', text: m })); });
 
     for (var d = 1; d <= 31; d++) {
-      cal.appendChild(el('div', { class: 'cal-rowhead', text: String(d) }));
       for (var m = 1; m <= 12; m++) {
         if (d > C.daysInMonth(year, m)) { cal.appendChild(el('div', { class: 'day void' })); continue; }
         cal.appendChild(el('button', { type: 'button', 'data-date': C.iso(year, m, d) }));
@@ -145,7 +150,6 @@
     }
 
     [['Jours ouvrés', 'workdays'], ['Absences', 'absences'], ['Télétravail', 'tt'], ['Sur site', 'onsite']].forEach(function (row, i) {
-      cal.appendChild(el('div', { class: 'cal-foot-label' + (i === 0 ? ' first' : ''), text: i === 0 ? 'Σ' : '' }));
       stats.months.forEach(function (ms) {
         cal.appendChild(el('div', { class: 'cal-foot' + (i === 0 ? ' first' : ''), title: row[0], 'data-foot': row[1], 'data-m': String(ms.month) }, [el('span', { text: row[0] }), el('span', { text: String(ms[row[1]]) })]));
       });
@@ -165,6 +169,7 @@
     var label = describeDay(s, e, holidays[s]);
     btn.title = label; btn.setAttribute('aria-label', label);
     btn.textContent = '';
+    btn.appendChild(el('span', { class: 'dn', text: String(+s.slice(8)) }));
     btn.appendChild(el('span', { class: 'wd', text: C.WEEKDAYS[C.weekday(s)] }));
     if (e.c) btn.appendChild(el('span', { class: 'code', text: e.c }));
   }
@@ -265,7 +270,7 @@
   }
 
   function render() {
-    renderYearSelect(); renderPalette(); renderCalendar(); renderLegend(); renderSummary();
+    applyDayColors(); renderYearSelect(); renderPalette(); renderCalendar(); renderLegend(); renderSummary();
   }
 
   /* ---------- interactions calendrier ---------- */
@@ -372,6 +377,15 @@
     b.appendChild(el('button', { type: 'button', class: 'btn', text: 'Ajouter une période', onclick: function () { y.schoolHolidays = y.schoolHolidays || []; y.schoolHolidays.push({ name: 'Vacances', start: year + '-01-01', end: year + '-01-08' }); save(); renderSettings(); render(); } }));
     b.appendChild(el('p', { class: 'note', text: 'La date de reprise est le premier jour de classe : le bandeau jaune s’arrête la veille.' }));
 
+    b.appendChild(el('h3', { text: 'Couleurs du calendrier' }));
+    [['weekend', 'Week-end'], ['holiday', 'Jour férié']].forEach(function (k) {
+      b.appendChild(el('div', { class: 'row' }, [
+        el('input', { type: 'color', value: model.dayColors[k[0]], 'aria-label': 'Couleur ' + k[1], onchange: function (e) { model.dayColors[k[0]] = e.target.value; save(); render(); } }),
+        el('strong', { class: 'grow', text: k[1] }),
+        el('button', { type: 'button', class: 'btn', text: 'Par défaut', onclick: function () { model.dayColors[k[0]] = C.DEFAULT_DAY_COLORS[k[0]]; save(); renderSettings(); render(); } })
+      ]));
+    });
+
     b.appendChild(el('h3', { text: 'Types de jours' }));
     model.types.forEach(function (t, i) {
       var used = Object.keys(model.years).some(function (k) { return Object.keys(model.years[k].days).some(function (d) { return model.years[k].days[d].c === t.code; }); });
@@ -466,7 +480,7 @@
 
   /* ---------- démarrage ---------- */
   model = load();
-  if (!storageGet(STORAGE_KEY)) save(); // première ouverture : on fige la graine
+  save(); // première ouverture : on fige la graine ; sinon on enregistre le modèle migré
   yearData(year);
   render();
   window.addEventListener('load', function () {

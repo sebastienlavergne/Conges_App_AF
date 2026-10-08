@@ -10,6 +10,7 @@
   var DEFAULT_TYPES = [
     { code: 'TT', label: 'Télétravail', color: '#4f9d69', quota: false, absence: false },
     { code: 'A', label: 'Astreinte', color: '#e0a526', quota: false, absence: false },
+    { code: 'PI', label: 'PI Event', color: '#b07fd4', quota: false, absence: false },
     { code: 'CA', label: 'Congés annuels', ref: 'CA01', color: '#3b82c4', quota: true, absence: true },
     { code: 'CJT', label: 'CJT', ref: 'RE01', color: '#8b5cc7', quota: true, absence: true },
     { code: 'CCA', label: 'CCA', ref: 'CA03', color: '#d9558f', quota: true, absence: true },
@@ -25,6 +26,8 @@
   var PLACE_COLORS = ['#b8a1d9', '#f2a6d8', '#e6b84a', '#6bb5a8', '#7fa6e0', '#d99a6c', '#a3c76b', '#c9a0a0'];
 
   var HOURS_PER_DAY = 7;
+  var MODEL_VERSION = 2;
+  var DEFAULT_DAY_COLORS = { weekend: '#aeb4bf', holiday: '#e07b7b' };
 
   /* ---------- dates (toutes en ISO « AAAA-MM-JJ », calculs en UTC) ---------- */
 
@@ -69,7 +72,10 @@
   }
 
   function newModel() {
-    return { version: 1, hoursPerDay: HOURS_PER_DAY, types: JSON.parse(JSON.stringify(DEFAULT_TYPES)), places: [], years: {} };
+    return {
+      version: MODEL_VERSION, hoursPerDay: HOURS_PER_DAY, types: JSON.parse(JSON.stringify(DEFAULT_TYPES)),
+      dayColors: JSON.parse(JSON.stringify(DEFAULT_DAY_COLORS)), places: [], years: {}
+    };
   }
 
   // Construit un modèle complet à partir d'une sauvegarde / de la graine (tolérant aux champs manquants).
@@ -78,6 +84,9 @@
     if (!src || typeof src !== 'object') return m;
     if (Array.isArray(src.types) && src.types.length) m.types = src.types;
     if (typeof src.hoursPerDay === 'number' && src.hoursPerDay > 0) m.hoursPerDay = src.hoursPerDay;
+    if (src.dayColors) {
+      ['weekend', 'holiday'].forEach(function (k) { if (/^#[0-9a-f]{6}$/i.test(src.dayColors[k] || '')) m.dayColors[k] = src.dayColors[k]; });
+    }
     (src.places || []).forEach(function (p, i) {
       var place = typeof p === 'string' ? { name: p, color: PLACE_COLORS[i % PLACE_COLORS.length] } : p;
       if (place && place.name) m.places.push(place);
@@ -91,7 +100,27 @@
         days: s.days || {}
       };
     });
+    migrate(m, src.version || 1);
     return m;
+  }
+
+  // v1 -> v2 : « PI Event » n'est plus un lieu mais un type de jour (code PI).
+  function migrate(m, fromVersion) {
+    if (fromVersion >= 2) return;
+    if (!typeByCode(m, 'PI')) {
+      var at = 0;
+      m.types.forEach(function (t, i) { if (t.code === 'A') at = i + 1; });
+      m.types.splice(at, 0, JSON.parse(JSON.stringify(DEFAULT_TYPES[2])));
+    }
+    m.places = m.places.filter(function (p) { return p.name !== 'PI Event'; });
+    Object.keys(m.years).forEach(function (y) {
+      var days = m.years[y].days;
+      Object.keys(days).forEach(function (d) {
+        if (days[d].p !== 'PI Event') return;
+        delete days[d].p;
+        if (!days[d].c) days[d].c = 'PI'; // un code déjà saisi est conservé
+      });
+    });
   }
 
   function typeByCode(model, code) {
@@ -163,7 +192,7 @@
   }
 
   var api = {
-    MONTHS: MONTHS, WEEKDAYS: WEEKDAYS, DEFAULT_TYPES: DEFAULT_TYPES, PLACE_COLORS: PLACE_COLORS,
+    MONTHS: MONTHS, DEFAULT_DAY_COLORS: DEFAULT_DAY_COLORS, WEEKDAYS: WEEKDAYS, DEFAULT_TYPES: DEFAULT_TYPES, PLACE_COLORS: PLACE_COLORS,
     iso: iso, addDays: addDays, weekday: weekday, isWeekend: isWeekend, daysInMonth: daysInMonth, todayISO: todayISO,
     easter: easter, frenchHolidays: frenchHolidays, isWorkday: isWorkday, toSet: toSet,
     emptyYear: emptyYear, newModel: newModel, normalizeModel: normalizeModel, typeByCode: typeByCode,

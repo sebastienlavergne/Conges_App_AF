@@ -7,27 +7,29 @@
   --muted: #5d6676;
   --accent: #2563a0;
   --accent-contrast: #ffffff;
-  --off: #e9ebf0;
-  --holiday: #f3d9d9;
+  --weekend-c: #aeb4bf;
+  --holiday-c: #e07b7b;
+  --off: color-mix(in srgb, var(--weekend-c) 38%, var(--surface));
+  --holiday: color-mix(in srgb, var(--holiday-c) 38%, var(--surface));
   --school: #e8b84a;
   --danger: #c0392b;
   --ok: #2e8b57;
   --radius: 10px;
-  --day-w: 62px;
+  --day-w: 76px;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #12151b; --surface: #1b2029; --surface-2: #252b37; --border: #343b49;
     --text: #e6e9ef; --muted: #98a1b2; --accent: #6ea8e0; --accent-contrast: #0e1a28;
-    --off: #232935; --holiday: #4a2d2f; --school: #c9a03c; --danger: #ef7a6c; --ok: #5fc08a;
+    --school: #c9a03c; --danger: #ef7a6c; --ok: #5fc08a;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #12151b; --surface: #1b2029; --surface-2: #252b37; --border: #343b49;
   --text: #e6e9ef; --muted: #98a1b2; --accent: #6ea8e0; --accent-contrast: #0e1a28;
-  --off: #232935; --holiday: #4a2d2f; --school: #c9a03c; --danger: #ef7a6c; --ok: #5fc08a;
+  --school: #c9a03c; --danger: #ef7a6c; --ok: #5fc08a;
   color-scheme: dark;
 }
 
@@ -106,18 +108,20 @@ button { cursor: pointer; }
 
 /* ----- calendrier ----- */
 .calendar-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
-.calendar { display: grid; grid-template-columns: 34px repeat(12, minmax(var(--day-w), 1fr)); min-width: calc(34px + 12 * var(--day-w)); user-select: none; -webkit-user-select: none; }
-.cal-head, .cal-rowhead, .cal-foot-label, .cal-foot { background: var(--surface-2); font-size: 12px; }
-.cal-head { position: sticky; top: 0; padding: 6px 4px; text-align: center; font-weight: 600; border-left: 1px solid var(--border); }
-.cal-head.corner { border-left: 0; }
-.cal-rowhead { display: flex; align-items: center; justify-content: center; color: var(--muted); font-variant-numeric: tabular-nums; border-top: 1px solid var(--border); }
+.calendar { display: grid; grid-template-columns: repeat(12, minmax(var(--day-w), 1fr)); min-width: calc(12 * var(--day-w)); user-select: none; -webkit-user-select: none; }
+.cal-head, .cal-foot { background: var(--surface-2); font-size: 12px; }
+.cal-head { padding: 6px 4px; text-align: center; font-weight: 600; border-left: 1px solid var(--border); }
+.calendar > :nth-child(12n + 1) { border-left: 0; }
 .day {
   --c: transparent;
   display: flex; align-items: center; gap: 4px; height: 26px; padding: 0 5px; min-width: 0;
   border: 0; border-top: 1px solid var(--border); border-left: 1px solid var(--border); border-radius: 0;
   background: var(--surface); text-align: left; position: relative;
 }
-.day .wd { width: 10px; font-size: 10px; color: var(--muted); flex: none; }
+.day .dn { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; min-width: 15px; text-align: right; flex: none; }
+.day .wd { font-size: 10px; color: var(--muted); flex: none; }
+.day.has-code .wd { color: var(--text); opacity: .7; }
+.day.today .dn { color: var(--accent); font-weight: 800; }
 .day .code { font-weight: 700; font-size: 12px; margin-left: auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .day.void { background: var(--surface-2); cursor: default; }
 .day.off { background: var(--off); }
@@ -129,7 +133,6 @@ button { cursor: pointer; }
 .day:not(.void):hover { filter: brightness(.94); }
 .day.sel-flash { animation: flash .35s; }
 @keyframes flash { from { box-shadow: inset 0 0 0 2px var(--accent); } to { box-shadow: inset 0 0 0 0 transparent; } }
-.cal-foot-label { display: flex; align-items: center; justify-content: center; border-top: 1px solid var(--border); font-size: 10px; color: var(--muted); text-align: center; padding: 2px; }
 .cal-foot { display: flex; justify-content: space-between; align-items: center; padding: 3px 7px; border-top: 1px solid var(--border); border-left: 1px solid var(--border); font-variant-numeric: tabular-nums; }
 .cal-foot span:first-child { color: var(--muted); font-size: 11px; }
 .cal-foot span:last-child { font-weight: 600; }

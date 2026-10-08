@@ -15,7 +15,8 @@ Ouvrir `index.html` dans un navigateur (ou publier le dossier tel quel, par exem
 - Pied du calendrier : jours ouvrés, absences, télétravail et jours sur site par mois.
 - **Annuler** : bouton ou Ctrl+Z.
 - **Réglages** : droits de l'année, jours fériés (génération automatique pour la France), vacances scolaires,
-  types de jours (libellés, couleurs, « décompté d'un droit », « absence ») et lieux.
+  couleurs des week-ends et jours fériés, types de jours (libellés, couleurs, « décompté d'un droit »,
+  « absence ») et lieux.
 - **Données** : export / import JSON. Les données sont stockées dans le navigateur (`localStorage`), sur
   l'appareil uniquement : pensez à exporter régulièrement.
 
@@ -29,7 +30,8 @@ pip install openpyxl
 python3 tools/import_excel.py chemin/vers/AF_Activites.xlsx data/seed.js
 ```
 
-Le code `CP` (congés payés, 2018-2021) est converti en `CA`.
+Le code `CP` (congés payés, 2018-2021) est converti en `CA`. La légende « PI Event » (cellules colorées) devient
+le type de jour `PI`.
 
 > `data/seed.js` contient vos données personnelles. Si ce dépôt est public ou publié sur Internet,
 > supprimez ce fichier (l'application démarre alors vide) et importez votre sauvegarde JSON.

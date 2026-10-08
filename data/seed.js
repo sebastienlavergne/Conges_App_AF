@@ -1,12 +1,11 @@
 // Généré par tools/import_excel.py à partir de AF_Activites.xlsx
 window.CONGES_SEED = {
- "version": 1,
+ "version": 2,
  "places": [
   "CDG",
   "VLB",
   "INFOTEL",
   "Casablanca",
-  "PI Event",
   "BER",
   "CAS",
   "AMS"
@@ -4314,10 +4313,10 @@ window.CONGES_SEED = {
      "c": "TT"
     },
     "2026-01-19": {
-     "p": "PI Event"
+     "c": "PI"
     },
     "2026-01-20": {
-     "p": "PI Event"
+     "c": "PI"
     },
     "2026-01-21": {
      "c": "TT"
@@ -4383,10 +4382,10 @@ window.CONGES_SEED = {
      "c": "TT"
     },
     "2026-03-23": {
-     "p": "PI Event"
+     "c": "PI"
     },
     "2026-03-24": {
-     "p": "PI Event"
+     "c": "PI"
     },
     "2026-03-25": {
      "c": "TT"
@@ -4479,10 +4478,10 @@ window.CONGES_SEED = {
      "c": "TT"
     },
     "2026-06-23": {
-     "p": "PI Event"
+     "c": "PI"
     },
     "2026-06-24": {
-     "p": "PI Event"
+     "c": "PI"
     },
     "2026-06-26": {
      "c": "TT"
@@ -4596,10 +4595,10 @@ window.CONGES_SEED = {
      "c": "TT"
     },
     "2026-09-22": {
-     "p": "PI Event"
+     "c": "PI"
     },
     "2026-09-23": {
-     "p": "PI Event"
+     "c": "PI"
     },
     "2026-09-25": {
      "c": "TT"
@@ -4683,10 +4682,10 @@ window.CONGES_SEED = {
      "c": "TT"
     },
     "2026-12-15": {
-     "p": "PI Event"
+     "c": "PI"
     },
     "2026-12-16": {
-     "p": "PI Event"
+     "c": "PI"
     },
     "2026-12-18": {
      "c": "TT"
