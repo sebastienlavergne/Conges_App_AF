@@ -172,6 +172,7 @@
     btn.appendChild(el('span', { class: 'dn', text: String(+s.slice(8)) }));
     btn.appendChild(el('span', { class: 'wd', text: C.WEEKDAYS[C.weekday(s)] }));
     if (e.c) btn.appendChild(el('span', { class: 'code', text: e.c }));
+    else if (e.p) btn.appendChild(el('span', { class: 'place-name', text: e.p }));
   }
   function patchDayByDate(s) {
     var btn = calEl.querySelector('[data-date="' + s + '"]');

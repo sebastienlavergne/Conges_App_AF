@@ -120,6 +120,8 @@ button { cursor: pointer; }
 }
 .day .dn { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; min-width: 17px; box-sizing: border-box; text-align: right; flex: none; }
 .day.has-place .dn { background: var(--p); color: #1c2330; border-radius: 4px; padding: 0 3px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--p) 55%, #000); }
+.day.has-place:not(.has-code) { background: color-mix(in srgb, var(--p) 45%, var(--surface)); }
+.day .place-name { margin-left: auto; font-size: 10px; font-weight: 700; letter-spacing: .02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .day .wd { font-size: 10px; color: var(--muted); flex: none; }
 .day.has-code .wd { color: var(--text); opacity: .7; }
 .day.today .dn { color: var(--accent); font-weight: 800; }
