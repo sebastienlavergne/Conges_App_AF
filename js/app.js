@@ -350,7 +350,7 @@
       var upd = function () { var q = +y.quotas[t.code] || 0; unit.textContent = 'jours' + (t.hours ? ' = ' + C.formatHours(q * model.hoursPerDay) : ''); };
       b.appendChild(el('div', { class: 'row' }, [
         el('strong', { class: 'grow', text: t.code + (t.ref ? ' · ' + t.ref : '') }),
-        numInput(y.quotas[t.code] != null ? y.quotas[t.code] : 0, function (v) { y.quotas[t.code] = isNaN(v) ? 0 : v; save(); upd(); renderSummary(); }),
+        numInput((+y.quotas[t.code] || 0).toFixed(2), function (v) { y.quotas[t.code] = isNaN(v) ? 0 : v; save(); upd(); renderSummary(); }),
         unit
       ]));
       upd();
