@@ -109,8 +109,13 @@ button { cursor: pointer; }
 /* ----- calendrier ----- */
 .calendar-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
 .calendar { display: grid; grid-template-columns: repeat(12, minmax(var(--day-w), 1fr)); min-width: calc(12 * var(--day-w)); user-select: none; -webkit-user-select: none; }
-.cal-head, .cal-foot { background: var(--surface-2); font-size: 12px; }
-.cal-head { padding: 6px 4px; text-align: center; font-weight: 600; border-left: 1px solid var(--border); }
+.cal-foot { background: var(--surface-2); font-size: 12px; }
+.cal-head {
+  padding: 9px 2px 8px; text-align: center; font-size: 13px; font-weight: 700; letter-spacing: .01em;
+  background: var(--accent); color: var(--accent-contrast); border-left: 1px solid color-mix(in srgb, var(--accent-contrast) 30%, var(--accent));
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cal-head.current { box-shadow: inset 0 -4px 0 var(--school); }
 .calendar > :nth-child(12n + 1) { border-left: 0; }
 .day {
   --c: transparent;

@@ -139,7 +139,10 @@
   function renderCalendar() {
     var y = yearData(year), holidays = C.toSet(y.holidays), stats = C.yearStats(model, year, today);
     var cal = $('calendar'); cal.textContent = '';
-    C.MONTHS.forEach(function (m) { cal.appendChild(el('div', { class: 'cal-head', text: m })); });
+    C.MONTHS.forEach(function (m, i) {
+      var current = year === +today.slice(0, 4) && i + 1 === +today.slice(5, 7);
+      cal.appendChild(el('div', { class: 'cal-head' + (current ? ' current' : ''), text: m, title: current ? 'Mois en cours' : null }));
+    });
 
     for (var d = 1; d <= 31; d++) {
       for (var m = 1; m <= 12; m++) {
