@@ -9,7 +9,7 @@ Ouvrir `index.html` dans un navigateur (ou publier le dossier tel quel, par exem
 
 - **Pinceau** : choisir un type (TT, CA, CJT…), puis cliquer ou glisser sur les jours du calendrier.
   Recliquer sur un jour qui porte déjà ce code l'efface. **Gomme** efface le code et le lieu.
-  Un pinceau **Lieu** (CDG, VLB…) ajoute le triangle de couleur des jours (équivalent des cellules colorées).
+  Un pinceau **Lieu** (CDG, VLB…) colore le numéro du jour, comme les cellules colorées du classeur.
 - **Soldes** (panneau de droite) : droits, pris (jusqu'à aujourd'hui), posés (toute l'année), reste maintenant et
   reste prévisionnel ; RA et CH sont aussi affichés en heures (7 h par jour, réglable).
 - Pied du calendrier : jours ouvrés, absences, télétravail et jours sur site par mois.

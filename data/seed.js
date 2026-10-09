@@ -2,13 +2,34 @@
 window.CONGES_SEED = {
  "version": 2,
  "places": [
-  "CDG",
-  "VLB",
-  "INFOTEL",
-  "Casablanca",
-  "BER",
-  "CAS",
-  "AMS"
+  {
+   "name": "CDG",
+   "color": "#fff2cc"
+  },
+  {
+   "name": "VLB",
+   "color": "#ffe1ff"
+  },
+  {
+   "name": "INFOTEL",
+   "color": "#f4b183"
+  },
+  {
+   "name": "Casablanca",
+   "color": "#e6cd83"
+  },
+  {
+   "name": "BER",
+   "color": "#b8a1d9"
+  },
+  {
+   "name": "CAS",
+   "color": "#ffe699"
+  },
+  {
+   "name": "AMS",
+   "color": "#6bb5a8"
+  }
  ],
  "years": {
   "2018": {

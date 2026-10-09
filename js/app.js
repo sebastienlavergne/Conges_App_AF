@@ -203,6 +203,11 @@
     var y = yearData(year), box = $('legend'); box.textContent = '';
     box.appendChild(el('span', {}, [el('i', { style: 'background:var(--holiday)' }), 'Jour férié']));
     box.appendChild(el('span', {}, [el('i', { style: 'background:var(--off)' }), 'Week-end']));
+    var usedPlaces = {};
+    Object.keys(y.days).forEach(function (d) { if (y.days[d].p) usedPlaces[y.days[d].p] = true; });
+    model.places.filter(function (pl) { return usedPlaces[pl.name]; }).forEach(function (pl) {
+      box.appendChild(el('span', {}, [el('i', { style: 'background:' + pl.color + ';box-shadow:inset 0 0 0 1px color-mix(in srgb, ' + pl.color + ' 55%, #000)' }), 'Lieu : ' + pl.name]));
+    });
     (y.schoolHolidays || []).forEach(function (v) {
       box.appendChild(el('span', {}, [el('i', { style: 'background:var(--school)' }), v.name + ' : ' + frDate(v.start) + ' → ' + frDate(C.addDays(v.end, -1))]));
     });
