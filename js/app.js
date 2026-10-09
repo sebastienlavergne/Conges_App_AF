@@ -338,6 +338,9 @@
     return el('input', { type: 'number', class: 'num', step: step || '0.01', min: '0', value: value, onchange: function (e) { onChange(parseFloat(e.target.value)); } });
   }
 
+  // RA et CH (types « en heures ») : 2 décimales ; les autres droits s'affichent tels quels (entiers).
+  function quotaText(q, t) { return t.hours ? q.toFixed(2) : String(Math.round(q * 100) / 100); }
+
   function renderSettings() {
     var y = yearData(year), b = settingsBody;
     b.textContent = '';
@@ -350,7 +353,7 @@
       var upd = function () { var q = +y.quotas[t.code] || 0; unit.textContent = 'jours' + (t.hours ? ' = ' + C.formatHours(q * model.hoursPerDay) : ''); };
       b.appendChild(el('div', { class: 'row' }, [
         el('strong', { class: 'grow', text: t.code + (t.ref ? ' · ' + t.ref : '') }),
-        numInput((+y.quotas[t.code] || 0).toFixed(2), function (v) { y.quotas[t.code] = isNaN(v) ? 0 : v; save(); upd(); renderSummary(); }),
+        numInput(quotaText(+y.quotas[t.code] || 0, t), function (v) { y.quotas[t.code] = isNaN(v) ? 0 : v; save(); upd(); renderSummary(); }),
         unit
       ]));
       upd();
