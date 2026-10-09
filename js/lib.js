@@ -128,6 +128,18 @@
     return null;
   }
 
+  // Jours où un lieu est posé un week-end ou un jour férié (liste de { year, date, place }).
+  function weekendPlaceDays(model) {
+    var out = [];
+    Object.keys(model.years).forEach(function (y) {
+      var holidays = toSet(model.years[y].holidays), days = model.years[y].days;
+      Object.keys(days).sort().forEach(function (d) {
+        if (days[d].p && !isWorkday(d, holidays)) out.push({ year: y, date: d, place: days[d].p });
+      });
+    });
+    return out;
+  }
+
   /* ---------- statistiques ---------- */
 
   // today : date ISO servant à séparer « pris » (<= today) de « posé » (toute l'année).
@@ -195,7 +207,7 @@
     MONTHS: MONTHS, DEFAULT_DAY_COLORS: DEFAULT_DAY_COLORS, WEEKDAYS: WEEKDAYS, DEFAULT_TYPES: DEFAULT_TYPES, PLACE_COLORS: PLACE_COLORS,
     iso: iso, addDays: addDays, weekday: weekday, isWeekend: isWeekend, daysInMonth: daysInMonth, todayISO: todayISO,
     easter: easter, frenchHolidays: frenchHolidays, isWorkday: isWorkday, toSet: toSet,
-    emptyYear: emptyYear, newModel: newModel, normalizeModel: normalizeModel, typeByCode: typeByCode,
+    emptyYear: emptyYear, weekendPlaceDays: weekendPlaceDays, newModel: newModel, normalizeModel: normalizeModel, typeByCode: typeByCode,
     yearStats: yearStats, formatDays: formatDays, formatHours: formatHours
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.Conges = api;

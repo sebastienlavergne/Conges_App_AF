@@ -72,7 +72,7 @@ def iso(d):
 wb_f = openpyxl.load_workbook(SRC)
 wb_v = openpyxl.load_workbook(SRC, data_only=True)
 
-years, place_names, place_colors = {}, [], {}
+years, place_names, place_colors, dropped = {}, [], {}, []
 theme = theme_colors(wb_f)
 for ws in wb_f:
     if not ws.title.isdigit():
@@ -92,16 +92,33 @@ for ws in wb_f:
                     place_names.append(c.value)
                     place_colors[c.value] = sig_to_hex(sig, theme)
 
+    # --- jours fériés de l'onglet (utiles pour savoir ce qu'Excel affiche vraiment) ---
+    holiday_dates = {iso(wv.cell(r, 28).value) for r in range(1, ws.max_row + 1)
+                     if isinstance(wv.cell(r, 28).value, (dt.datetime, dt.date))}
+
     # --- grille des jours ---
+    # Excel recouvre la couleur d'une cellule (mise en forme conditionnelle) les week-ends et jours fériés,
+    # et la couleur d'une cellule de code dès qu'un code y est saisi : une marque de lieu qui tombe là est
+    # invisible dans le classeur (reliquat de copie d'un onglet à l'autre). On ne la reprend pas.
     days = {}
     for m in range(12):
         for d in range(1, calendar.monthrange(year, m + 1)[1] + 1):
             r = 2 + d
             date_cell, code_cell = ws.cell(r, 2 + 2 * m), ws.cell(r, 3 + 2 * m)
+            day = dt.date(year, m + 1, d)
             code = code_cell.value if isinstance(code_cell.value, str) and not code_cell.value.startswith("=") else None
             if code:
                 code = CODE_ALIASES.get(code.strip(), code.strip())
-            place = legend.get(fill_sig(date_cell)) or legend.get(fill_sig(code_cell))
+            covered = day.weekday() >= 5 or day.isoformat() in holiday_dates
+            place = None
+            for cell, is_code_cell in ((date_cell, False), (code_cell, True)):
+                name = legend.get(fill_sig(cell))
+                if not name:
+                    continue
+                if covered or (is_code_cell and code):
+                    dropped.append((day.isoformat(), name))
+                else:
+                    place = place or name
             if place in PLACE_AS_TYPE:
                 code, place = code or PLACE_AS_TYPE[place], None  # un code déjà saisi est conservé
             if code or place:
@@ -110,7 +127,7 @@ for ws in wb_f:
                     entry["c"] = code
                 if place:
                     entry["p"] = place
-                days[dt.date(year, m + 1, d).isoformat()] = entry
+                days[day.isoformat()] = entry
 
     # --- droits, jours fériés, vacances scolaires ---
     quotas, holidays, school = {}, [], []
@@ -157,3 +174,7 @@ for y, v in sorted(years.items()):
     print(y, "fériés:", len(v["holidays"]), "vac:", len(v["schoolHolidays"]), "lieux:",
           sum(1 for e in v["days"].values() if "p" in e), "codes:", cnt, "droits:", v["quotas"])
 print("lieux:", places)
+
+print("marques de lieu ignorées (invisibles dans Excel : week-end, jour férié ou code saisi) :", len(dropped))
+for d, n in dropped:
+    print("   ", d, n)

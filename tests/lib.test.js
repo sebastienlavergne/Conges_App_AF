@@ -107,3 +107,19 @@ test('graine : PI Event est un type, 10 jours en 2026, plus de lieu du même nom
   const s = L.yearStats(m, '2026', '2026-10-08');
   assert.equal(s.rows.find((r) => r.type.code === 'PI').planned, 10);
 });
+
+test('graine : aucun lieu sur un week-end ou un jour férié (invisible dans l\'Excel d\'origine)', () => {
+  const m = L.normalizeModel(loadSeed());
+  assert.deepEqual(L.weekendPlaceDays(m), []);
+  const days = m.years['2026'].days;
+  assert.equal(days['2026-02-08'], undefined);       // dimanche
+  assert.equal(days['2026-05-25'], undefined);       // lundi de Pentecôte
+  assert.deepEqual(days['2026-01-28'], { p: 'CDG' }); // jour ouvré : visible dans Excel
+  assert.deepEqual(days['2026-10-13'], { p: 'CDG' });
+});
+
+test('weekendPlaceDays repère les lieux posés un week-end ou un jour férié', () => {
+  const m = L.normalizeModel({ version: 2, places: ['CDG'], years: { 2026: { holidays: ['2026-05-25'], days: {
+    '2026-02-08': { p: 'CDG' }, '2026-05-25': { c: 'CA', p: 'CDG' }, '2026-02-09': { p: 'CDG' } } } } });
+  assert.deepEqual(L.weekendPlaceDays(m).map((x) => x.date), ['2026-02-08', '2026-05-25']);
+});

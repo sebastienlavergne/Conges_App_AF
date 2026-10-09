@@ -30,7 +30,8 @@ pip install openpyxl
 python3 tools/import_excel.py chemin/vers/AF_Activites.xlsx data/seed.js
 ```
 
-Le code `CP` (congés payés, 2018-2021) est converti en `CA`. La légende « PI Event » (cellules colorées) devient
+Le code `CP` (congés payés, 2018-2021) est converti en `CA`. Les marques de lieu masquées dans Excel (week-end,
+jour férié, ou cellule de code déjà remplie) ne sont pas reprises ; le script les liste à l'import. La légende « PI Event » (cellules colorées) devient
 le type de jour `PI`.
 
 > `data/seed.js` contient vos données personnelles. Si ce dépôt est public ou publié sur Internet,

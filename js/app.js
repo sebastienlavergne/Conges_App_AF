@@ -454,6 +454,20 @@
       el('button', { type: 'button', class: 'btn primary', text: 'Exporter (JSON)', onclick: exportJSON }),
       el('button', { type: 'button', class: 'btn', text: 'Importer une sauvegarde…', onclick: function () { $('import-file').click(); } })
     ]));
+    var stale = C.weekendPlaceDays(model);
+    b.appendChild(el('h3', { text: 'Nettoyage' }));
+    b.appendChild(el('div', { class: 'row' }, [
+      el('button', { type: 'button', class: 'btn', disabled: !stale.length, text: 'Retirer les lieux posés sur un week-end ou un jour férié (' + stale.length + ')', onclick: function () {
+        if (!window.confirm('Retirer le lieu de ' + stale.length + ' jour(s) tombant un week-end ou un jour férié ? Les codes (TT, CA…) sont conservés.')) return;
+        stale.forEach(function (x) {
+          var d = model.years[x.year].days;
+          delete d[x.date].p;
+          if (!d[x.date].c) delete d[x.date];
+        });
+        save(); render(); renderData(); toast(stale.length + ' lieu(x) retiré(s).');
+      } })
+    ]));
+    b.appendChild(el('p', { class: 'note', text: 'Dans l’Excel d’origine, ces marques étaient masquées par la mise en forme des week-ends et jours fériés.' }));
     b.appendChild(el('h3', { text: 'Zone sensible' }));
     b.appendChild(el('div', { class: 'row' }, [
       window.CONGES_SEED ? el('button', { type: 'button', class: 'btn danger', text: 'Revenir aux données importées d’Excel', onclick: function () { confirmReplace(C.normalizeModel(window.CONGES_SEED), 'Revenir aux données d’origine ? Vos modifications seront perdues.'); } }) : null,
